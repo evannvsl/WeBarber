@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'WeBarber — Profile')
+@section('title', 'WeBarber | Profile')
 
 @section('content')
 
@@ -77,6 +77,19 @@
       <button type="submit"
         class="self-start px-6 py-2.5 bg-[#111111] text-white text-[0.88rem] font-semibold rounded-full transition-opacity hover:opacity-80 cursor-pointer border-0 mt-2">
         Update Password
+      </button>
+    </form>
+  </section>
+
+  {{-- Logout --}}
+  <section class="p-8 border border-[#ffd2d2] rounded-2xl bg-[#fff8f8] mt-8">
+    <h3 class="text-[1.1rem] font-bold text-[#111111] mb-1">Sign Out</h3>
+    <p class="text-[0.85rem] text-[#6e6e73] mb-5">Keluar dari akun WeBarber kamu. Kamu bisa login kembali kapan saja.</p>
+    <form method="POST" action="{{ route('logout') }}">
+      @csrf
+      <button type="submit"
+        class="px-6 py-2.5 bg-white border border-[#ffb3b3] text-[#c0392b] text-[0.88rem] font-semibold rounded-full transition-all hover:bg-[#c0392b] hover:text-white hover:border-[#c0392b] cursor-pointer">
+        Logout dari akun ini
       </button>
     </form>
   </section>

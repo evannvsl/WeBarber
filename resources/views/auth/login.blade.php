@@ -35,7 +35,7 @@
   </label>
 
   <button type="submit"
-    class="w-full py-2.5 bg-[#111111] text-white text-[0.9rem] font-semibold rounded-xl transition-opacity hover:opacity-80 cursor-pointer border-0 mt-2">
+    class="w-full py-2.5 bg-[#111111] text-white text-[0.9rem] font-semibold rounded-xl transition-opacity hmaover:opacity-80 cursor-pointer border-0 mt-2">
     Sign in
   </button>
 </form>

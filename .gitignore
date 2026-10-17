@@ -3,6 +3,7 @@
 .env
 .env.backup
 .env.production
+.env.example
 .phpactor.json
 .phpunit.result.cache
 /.codex
@@ -25,3 +26,29 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+CLAUDE.md
+AGENTS.md
+.editorconfig
+phpunit.xml
+*.xml.bak
+
+# Composer & npm lock
+# composer.lock
+# package-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Laravel generated
+/bootstrap/cache/*.php
+/storage/framework/sessions/*
+/storage/framework/cache/*
+/storage/framework/views/*
+!/storage/framework/sessions/.gitignore
+!/storage/framework/cache/.gitignore
+!/storage/framework/views/.gitignore

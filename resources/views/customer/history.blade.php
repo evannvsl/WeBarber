@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'WeBarber — My Bookings')
+@section('title', 'WeBarber | My Bookings')
 
 @section('content')
 
