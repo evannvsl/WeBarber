@@ -25,10 +25,11 @@ class HomeController extends Controller
 
     public function barbers()
     {
-        $barbers = Barber::with('user', 'schedules')
+        $barbers  = Barber::with('user', 'schedules')
             ->where('is_active', true)
             ->get();
+        $services = Service::where('is_active', true)->orderBy('name')->get();
 
-        return view('customer.barbers', compact('barbers'));
+        return view('customer.barbers', compact('barbers', 'services'));
     }
 }

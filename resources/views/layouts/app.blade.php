@@ -55,7 +55,7 @@
         @elseif(auth()->user()->isBarber())
           <a href="{{ route('barber.dashboard') }}" class="nav-link {{ request()->routeIs('barber.*') ? 'active' : '' }}">Dashboard</a>
         @else
-          <a href="{{ route('customer.booking') }}" class="nav-link {{ request()->routeIs('customer.booking') ? 'active' : '' }}">Booking</a>
+          <a href="{{ route('customer.history') }}"  class="nav-link {{ request()->routeIs('customer.history') ? 'active' : '' }}">History</a>
           <a href="{{ route('customer.profile') }}"  class="nav-link {{ request()->routeIs('customer.profile') ? 'active' : '' }}">Profile</a>
         @endif
       @else

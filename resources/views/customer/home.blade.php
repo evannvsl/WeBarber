@@ -144,40 +144,28 @@
     <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-extrabold tracking-[-0.6px] text-[#111111] mb-5">Our Services</h2>
     <div class="grid grid-cols-3 gap-3 mb-6 max-sm:grid-cols-1">
 
-      {{-- Haircut — card hitam, link ke booking --}}
-      @auth
-      <a href="{{ route('customer.booking') }}" class="menu-card flex flex-col gap-1 p-6 rounded-xl border border-[#111111] bg-[#111111] no-underline transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_24px_rgba(0,0,0,0.18)]">
-      @else
-      <a href="{{ route('login') }}" class="menu-card flex flex-col gap-1 p-6 rounded-xl border border-[#111111] bg-[#111111] no-underline transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_24px_rgba(0,0,0,0.18)]">
-      @endauth
+      {{-- Haircut — card hitam, link ke reservation form di Contact --}}
+      <a href="{{ route('barbers') }}#reservation" class="menu-card flex flex-col gap-1 p-6 rounded-xl border border-[#111111] bg-[#111111] no-underline transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_24px_rgba(0,0,0,0.18)]">
         <span class="text-[0.65rem] font-bold tracking-[0.18em] uppercase text-white/35">Haircut &amp; Styling</span>
         <span class="text-[1.05rem] font-bold tracking-tight text-white my-0.5">Premium Cuts</span>
         <span class="text-[0.78rem] text-white/45 leading-relaxed flex-1">Signature, Fade, Undercut &amp; more</span>
-        <span class="menu-card-arrow text-[0.9rem] text-white/50 mt-3 transition-transform duration-200">Book now →</span>
+        <span class="menu-card-arrow text-[0.9rem] text-white/50 mt-3 transition-transform duration-200">Reserve now →</span>
       </a>
 
-      {{-- Beard — card putih, link ke booking --}}
-      @auth
-      <a href="{{ route('customer.booking') }}" class="menu-card flex flex-col gap-1 p-6 rounded-xl border border-[#d2d2d7] bg-white no-underline transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_24px_rgba(0,0,0,0.10)] hover:border-[#c2c2c7]">
-      @else
-      <a href="{{ route('login') }}" class="menu-card flex flex-col gap-1 p-6 rounded-xl border border-[#d2d2d7] bg-white no-underline transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_24px_rgba(0,0,0,0.10)] hover:border-[#c2c2c7]">
-      @endauth
+      {{-- Beard — card putih, link ke reservation form di Contact --}}
+      <a href="{{ route('barbers') }}#reservation" class="menu-card flex flex-col gap-1 p-6 rounded-xl border border-[#d2d2d7] bg-white no-underline transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_24px_rgba(0,0,0,0.10)] hover:border-[#c2c2c7]">
         <span class="text-[0.65rem] font-bold tracking-[0.18em] uppercase text-[#aeaeb2]">Beard</span>
         <span class="text-[1.05rem] font-bold tracking-tight text-[#111111] my-0.5">Beard &amp; Shave</span>
         <span class="text-[0.78rem] text-[#6e6e73] leading-relaxed flex-1">Trim, Hot Towel &amp; Combo package</span>
-        <span class="menu-card-arrow text-[0.9rem] text-[#aeaeb2] mt-3 transition-transform duration-200">Book now →</span>
+        <span class="menu-card-arrow text-[0.9rem] text-[#aeaeb2] mt-3 transition-transform duration-200">Reserve now →</span>
       </a>
 
-      {{-- Treatment — card putih, link ke booking --}}
-      @auth
-      <a href="{{ route('customer.booking') }}" class="menu-card flex flex-col gap-1 p-6 rounded-xl border border-[#d2d2d7] bg-white no-underline transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_24px_rgba(0,0,0,0.10)] hover:border-[#c2c2c7]">
-      @else
-      <a href="{{ route('login') }}" class="menu-card flex flex-col gap-1 p-6 rounded-xl border border-[#d2d2d7] bg-white no-underline transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_24px_rgba(0,0,0,0.10)] hover:border-[#c2c2c7]">
-      @endauth
+      {{-- Treatment — card putih, link ke reservation form di Contact --}}
+      <a href="{{ route('barbers') }}#reservation" class="menu-card flex flex-col gap-1 p-6 rounded-xl border border-[#d2d2d7] bg-white no-underline transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_24px_rgba(0,0,0,0.10)] hover:border-[#c2c2c7]">
         <span class="text-[0.65rem] font-bold tracking-[0.18em] uppercase text-[#aeaeb2]">Treatment</span>
         <span class="text-[1.05rem] font-bold tracking-tight text-[#111111] my-0.5">Hair Care</span>
         <span class="text-[0.78rem] text-[#6e6e73] leading-relaxed flex-1">Scalp massage, coloring &amp; styling</span>
-        <span class="menu-card-arrow text-[0.9rem] text-[#aeaeb2] mt-3 transition-transform duration-200">Book now →</span>
+        <span class="menu-card-arrow text-[0.9rem] text-[#aeaeb2] mt-3 transition-transform duration-200">Reserve now →</span>
       </a>
 
     </div>

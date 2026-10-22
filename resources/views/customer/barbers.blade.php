@@ -99,7 +99,7 @@
 <main class="wb-main">
 
   {{-- Reservation Form --}}
-  <section class="wb-section">
+  <section class="wb-section" id="reservation">
     <p class="eyebrow">Reservation</p>
     <h3>Reservation Form</h3>
 
@@ -139,16 +139,11 @@
 
         <div class="wb-field">
           <label for="Services">Choose Service</label>
-          <select id="Services" name="Services" required>
+          <select id="Services" name="service_ids[]" required>
             <option value="" selected disabled>Choose service</option>
-            <option value="Haircut">Haircut</option>
-            <option value="Haircut-Beard">Haircut + Beard</option>
-            <option value="Beard-Trim">Beard Trim</option>
-            <option value="Kids-Haircut">Kids Haircut</option>
-            <option value="Scalp-Massage">Scalp Massage</option>
-            <option value="Hair-Coloring">Hair Coloring</option>
-            <option value="Hot-Towel-Shave">Hot Towel Shave</option>
-            <option value="Hairwash-Blow">Hairwash &amp; Blow</option>
+            @foreach($services as $service)
+            <option value="{{ $service->id }}">{{ $service->name }} — Rp {{ number_format($service->price, 0, ',', '.') }}</option>
+            @endforeach
           </select>
         </div>
 
