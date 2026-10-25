@@ -39,7 +39,7 @@ class DashboardController extends Controller
             ->join('services as s', 'bd.service_id', '=', 's.id')
             ->join('bookings as b', 'bd.booking_id', '=', 'b.id')
             ->whereIn('b.status', ['confirmed', 'completed'])
-            ->selectRaw('s.name, SUM(bd.quantity) as total_dipesan')
+            ->selectRaw('s.name as nama_layanan, SUM(bd.quantity) as total_dipesan')
             ->groupBy('s.id', 's.name')
             ->orderByDesc('total_dipesan')
             ->take(5)

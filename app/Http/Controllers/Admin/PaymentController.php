@@ -15,7 +15,14 @@ class PaymentController extends Controller
             ->latest()
             ->paginate(15);
 
-        return view('admin.payments.index', compact('payments'));
+        $stats = [
+            'total'    => Payment::count(),
+            'paid'     => Payment::where('payment_status', 'paid')->count(),
+            'pending'  => Payment::where('payment_status', 'pending')->count(),
+            'revenue'  => Payment::where('payment_status', 'paid')->sum('amount'),
+        ];
+
+        return view('admin.payments.index', compact('payments', 'stats'));
     }
 
     public function store(Request $request)
