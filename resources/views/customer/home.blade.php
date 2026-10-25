@@ -34,16 +34,19 @@
     {{-- Tambah model baru: cukup tambah 1 baris di array ini (file, nama, tag) --}}
     @php
       $models = [
-        ['Long Bangs.jpeg',     'Long Bangs',  'Textured Fringe'],
-        ['kensuke.jpeg',        'Kensuke',     'Wet-Look Curtain'],
-        ['Jet Black Hair.jpeg', 'Jet Black',   'Skin Fade'],
-        ['brwn.jpeg',           'Brown Style', 'Layered Flow'],
-        ['7.jpeg',              'Wavy Curls',  'Soft Wolf Cut'],
-        ['img1.jpg' ,           'Classic Cut', 'Taper Fade'],
-        ['img2.jpg' ,           'Modern Look', 'Undercut'],
-        ['img3.jpg' ,           'Slick Back',  'Pompadour'],
-        ['img4.jpg' ,           'Short Crop',  'Buzz Cut'],
-        ['img5.jpg' ,           'Textured Top','Disconnected Cut'],        
+        ['01-Long Bangs.jpeg',     'Long Bangs',  'Textured Fringe'],
+        ['02-Kensuke.jpeg',        'Kensuke',     'Wet-Look Curtain'],
+        ['03-Jet Black Hair.jpeg', 'Jet Black',   'Buzz Cut'],
+        ['04-Brown.jpeg',           'Brown Style', 'Layered Flow'],
+        ['05-Wolf Cut.jpeg',              'Wavy Curls',  'Soft Wolf Cut'],
+        ['06-Comma Hair.jpeg' ,           'Korean Style', 'Comma Hair'],
+        ['07-Mullet.jpeg' ,           'Jayjo Windbreaker', 'Mullet'],
+        ['08-Tapper Fade.jpeg' ,           'Tapper',  'Fade'],
+        ['09-French Crop.jpeg' ,           'Clean',  'French Crop'],
+        ['10-Long.jpeg' ,           'Jackson Irvine','Long Hair Style'],        
+        ['11-Back.jpeg' ,           'Back Classic','Classic Combed-Back '],
+        ['12-Undercut.jpeg' ,           'Undercut','Classic Undercut'],
+        ['13-Etc.jpg' ,           'Etc','Various Styles'],
       ];
     @endphp
 

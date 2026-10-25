@@ -104,25 +104,76 @@
     </div>
 
     {{-- Services --}}
-    <div class="flex flex-col gap-2">
-      <label class="text-[0.8rem] font-semibold text-[#3a3a3c]">Pilih Layanan
-        <span class="text-[#aeaeb2] font-normal">(bisa lebih dari satu)</span>
-      </label>
+    <div class="flex flex-col gap-3">
+      <div class="flex items-baseline justify-between">
+        <label class="text-[0.8rem] font-semibold text-[#3a3a3c]">Pilih Layanan
+          <span class="text-[#aeaeb2] font-normal">(bisa lebih dari satu)</span>
+        </label>
+        {{-- Total harga & durasi realtime --}}
+        <span id="svc-summary" class="text-[0.78rem] font-semibold text-[#111111] hidden">
+          <span id="svc-total"></span> · <span id="svc-duration"></span>
+        </span>
+      </div>
+
       <div class="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
         @foreach($services as $service)
-        <label class="flex items-start gap-3 p-4 border border-[#d2d2d7] rounded-xl bg-white cursor-pointer transition-colors hover:border-[#b8a060] has-[:checked]:border-[#111111] has-[:checked]:bg-[#f5f5f7]">
+        @php $checked = in_array($service->id, old('service_ids', [])); @endphp
+        <label
+          data-price="{{ $service->price }}"
+          data-duration="{{ $service->duration_minutes }}"
+          class="svc-card group relative flex flex-col gap-1.5 px-5 py-4 border rounded-2xl bg-white cursor-pointer
+                 transition-all duration-200 hover:-translate-y-0.5
+                 hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-[#0a0a0a]
+                 {{ $checked ? 'border-[#111111] bg-[#0a0a0a] shadow-[0_4px_16px_rgba(0,0,0,0.12)]' : 'border-[#d2d2d7]' }}">
+
+          {{-- Checkbox tersembunyi --}}
           <input type="checkbox" name="service_ids[]" value="{{ $service->id }}"
-            {{ in_array($service->id, old('service_ids', [])) ? 'checked' : '' }}
-            class="mt-0.5 w-4 h-4 rounded accent-[#111111] shrink-0" />
-          <div class="flex flex-col gap-0.5 min-w-0">
-            <span class="text-[0.88rem] font-semibold text-[#111111] leading-tight">{{ $service->name }}</span>
-            <span class="text-[0.76rem] text-[#6e6e73]">{{ $service->price_formatted }} · ± {{ $service->duration_minutes }} min</span>
+            {{ $checked ? 'checked' : '' }}
+            class="sr-only svc-check" />
+
+          {{-- Checkmark pojok kanan atas --}}
+          <span class="svc-tick absolute top-3 right-3 w-5 h-5 rounded-full border flex items-center justify-center text-[0.65rem] font-bold transition-all
+            {{ $checked ? 'bg-[#b8a060] border-[#b8a060] text-white' : 'border-[#d2d2d7] text-transparent' }}">✓</span>
+
+          {{-- Nama & harga --}}
+          <div class="flex items-baseline justify-between gap-2 pr-6">
+            <span class="svc-name text-[0.95rem] font-bold tracking-tight leading-tight transition-colors
+              {{ $checked ? 'text-white' : 'text-[#0a0a0a]' }}">
+              {{ $service->name }}
+            </span>
+            <span class="svc-price text-[0.9rem] font-bold whitespace-nowrap transition-colors
+              {{ $checked ? 'text-[#b8a060]' : 'text-[#0a0a0a]' }}">
+              {{ $service->price_formatted }}
+            </span>
+          </div>
+
+          {{-- Deskripsi --}}
+          @if($service->description)
+          <p class="svc-desc text-[0.78rem] leading-relaxed transition-colors
+            {{ $checked ? 'text-white/55' : 'text-[#6e6e73]' }}">
+            {{ Str::limit($service->description, 80) }}
+          </p>
+          @endif
+
+          {{-- Durasi --}}
+          <div class="flex items-center justify-between mt-1">
+            <span class="svc-dur text-[0.7rem] font-semibold tracking-[0.05em] uppercase transition-colors
+              {{ $checked ? 'text-white/45' : 'text-[#aeaeb2]' }}">
+              ± {{ $service->duration_minutes }} min
+            </span>
+            <span class="svc-hint text-[0.7rem] font-bold tracking-[0.04em] transition-colors
+              {{ $checked ? 'text-[#b8a060]' : 'text-transparent group-hover:text-[#0a0a0a]' }}">
+              {{ $checked ? 'DIPILIH ✓' : 'PILIH →' }}
+            </span>
           </div>
         </label>
         @endforeach
       </div>
+
       @if($errors->has('service_ids'))
-      <p class="text-[0.78rem] text-red-600 font-medium">Pilih minimal satu layanan.</p>
+      <p class="text-[0.78rem] text-red-600 font-medium flex items-center gap-1">
+        <span>⚠</span> Pilih minimal satu layanan.
+      </p>
       @endif
     </div>
 
@@ -150,4 +201,85 @@
   </form>
 
 </main>
+@push('scripts')
+<script>
+  const cards = document.querySelectorAll('.svc-card');
+  const summaryEl = document.getElementById('svc-summary');
+  const totalEl   = document.getElementById('svc-total');
+  const durEl     = document.getElementById('svc-duration');
+
+  function formatRp(n) {
+    return 'Rp ' + n.toLocaleString('id-ID');
+  }
+
+  function updateSummary() {
+    let total = 0, mins = 0, count = 0;
+    cards.forEach(card => {
+      const cb = card.querySelector('.svc-check');
+      if (cb.checked) {
+        total += parseFloat(card.dataset.price);
+        mins  += parseInt(card.dataset.duration);
+        count++;
+      }
+    });
+    if (count > 0) {
+      totalEl.textContent = formatRp(total);
+      durEl.textContent   = '± ' + mins + ' min';
+      summaryEl.classList.remove('hidden');
+    } else {
+      summaryEl.classList.add('hidden');
+    }
+  }
+
+  function applyStyle(card, checked) {
+    const cb      = card.querySelector('.svc-check');
+    const tick    = card.querySelector('.svc-tick');
+    const nameEl  = card.querySelector('.svc-name');
+    const priceEl = card.querySelector('.svc-price');
+    const descEl  = card.querySelector('.svc-desc');
+    const durEl2  = card.querySelector('.svc-dur');
+    const hintEl  = card.querySelector('.svc-hint');
+
+    if (checked) {
+      card.classList.add('border-[#111111]', 'bg-[#0a0a0a]', 'shadow-[0_4px_16px_rgba(0,0,0,0.12)]', '-translate-y-0.5');
+      card.classList.remove('border-[#d2d2d7]', 'bg-white');
+      tick.classList.add('bg-[#b8a060]', 'border-[#b8a060]', 'text-white');
+      tick.classList.remove('border-[#d2d2d7]', 'text-transparent');
+      nameEl.classList.add('text-white'); nameEl.classList.remove('text-[#0a0a0a]');
+      priceEl.classList.add('text-[#b8a060]'); priceEl.classList.remove('text-[#0a0a0a]');
+      if (descEl) { descEl.classList.add('text-white/55'); descEl.classList.remove('text-[#6e6e73]'); }
+      durEl2.classList.add('text-white/45'); durEl2.classList.remove('text-[#aeaeb2]');
+      hintEl.textContent = 'DIPILIH ✓';
+      hintEl.classList.add('text-[#b8a060]'); hintEl.classList.remove('text-transparent', 'group-hover:text-[#0a0a0a]');
+    } else {
+      card.classList.remove('border-[#111111]', 'bg-[#0a0a0a]', 'shadow-[0_4px_16px_rgba(0,0,0,0.12)]', '-translate-y-0.5');
+      card.classList.add('border-[#d2d2d7]', 'bg-white');
+      tick.classList.remove('bg-[#b8a060]', 'border-[#b8a060]', 'text-white');
+      tick.classList.add('border-[#d2d2d7]', 'text-transparent');
+      nameEl.classList.remove('text-white'); nameEl.classList.add('text-[#0a0a0a]');
+      priceEl.classList.remove('text-[#b8a060]'); priceEl.classList.add('text-[#0a0a0a]');
+      if (descEl) { descEl.classList.remove('text-white/55'); descEl.classList.add('text-[#6e6e73]'); }
+      durEl2.classList.remove('text-white/45'); durEl2.classList.add('text-[#aeaeb2]');
+      hintEl.textContent = 'PILIH →';
+      hintEl.classList.remove('text-[#b8a060]'); hintEl.classList.add('text-transparent', 'group-hover:text-[#0a0a0a]');
+    }
+  }
+
+  cards.forEach(card => {
+    const cb = card.querySelector('.svc-check');
+
+    // Init state untuk yang sudah checked (old input)
+    applyStyle(card, cb.checked);
+
+    card.addEventListener('click', () => {
+      cb.checked = !cb.checked;
+      applyStyle(card, cb.checked);
+      updateSummary();
+    });
+  });
+
+  updateSummary();
+</script>
+@endpush
+
 @endsection

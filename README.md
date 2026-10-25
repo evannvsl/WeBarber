@@ -1,58 +1,167 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# WebBarber
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**WebBarber** adalah aplikasi web sistem reservasi barbershop yang dibangun sebagai **Proyek Akhir Mata Kuliah Pemrograman Web dan Basis Data**. Aplikasi ini memungkinkan customer memesan jadwal ke barber secara online, lengkap dengan manajemen layanan, jadwal, dan pembayaran.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fitur Utama
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Customer
+- Registrasi dan login akun
+- Melihat daftar barber aktif dan layanan yang tersedia
+- Membuat booking dengan memilih barber, layanan, tanggal, dan jam
+- Riwayat booking beserta status pembayaran
+- Edit profil dan ganti password
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Barber
+- Dashboard dengan ringkasan booking hari ini
+- Melihat jadwal dan riwayat pelayanan
 
-## Learning Laravel
+### Admin
+- Dashboard statistik (total customer, barber, booking, pendapatan)
+- Manajemen user (CRUD)
+- Manajemen barber dan jadwal kerja
+- Manajemen layanan/servis
+- Manajemen booking dan perubahan status
+- Pencatatan pembayaran (cash, transfer, QRIS)
+- Laporan pendapatan harian & bulanan
+- Statistik layanan dan barber terpopuler
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Teknologi yang Digunakan
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+| Komponen | Teknologi |
+|---|---|
+| Backend Framework | Laravel 11 (PHP) |
+| Database | MySQL |
+| Frontend | Blade Template + Tailwind CSS |
+| Build Tool | Vite |
+| Authentication | Laravel built-in Auth |
+| Package Manager | Composer + npm |
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Struktur Peran (Role)
 
+Sistem menggunakan **single-table inheritance** pada tabel `users` dengan kolom `role`:
+
+| Role | Akses |
+|---|---|
+| `admin` | Kelola semua data, lihat laporan, catat pembayaran |
+| `barber` | Lihat jadwal dan booking yang ditugaskan |
+| `customer` | Buat booking, lihat riwayat, kelola profil |
+
+---
+
+## Instalasi & Menjalankan Proyek
+
+### Prasyarat
+- PHP >= 8.2
+- Composer
+- MySQL
+- Node.js & npm
+
+### Langkah Instalasi
+
+**1. Clone repositori**
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone <url-repo>
+cd webarber
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+**2. Install dependensi PHP**
+```bash
+composer install
+```
 
-## Contributing
+**3. Install dependensi JavaScript**
+```bash
+npm install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**4. Salin dan konfigurasi environment**
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-## Code of Conduct
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**5. Jalankan migrasi database**
+```bash
+php artisan migrate
+```
 
-<!-- ## Security Vulnerabilities
+**6. Buat symlink storage**
+```bash
+php artisan storage:link
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed. -->
+**7. Build asset frontend**
+```bash
+npm run dev
+```
 
-## License
+**8. Jalankan server**
+```bash
+php artisan serve
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Aplikasi dapat diakses di **http://localhost:8000**
+
+---
+
+## Struktur Database
+
+Aplikasi menggunakan 7 tabel utama:
+
+```
+users ──── barbers ──── barber_schedules
+               │
+          bookings ──── booking_details ──── services
+               │
+           payments
+```
+
+| Tabel | Fungsi |
+|---|---|
+| `users` | Semua pengguna (admin, barber, customer) |
+| `barbers` | Profil dan status barber |
+| `services` | Katalog layanan beserta harga dan durasi |
+| `barber_schedules` | Jadwal kerja barber per hari |
+| `bookings` | Data reservasi customer |
+| `booking_details` | Detail layanan per booking (snapshot harga) |
+| `payments` | Pencatatan pembayaran |
+
+Dokumentasi lengkap database tersedia di [`DATABASE.md`](DATABASE.md).
+
+---
+
+## Struktur Direktori Utama
+
+```
+webarber/
+├── app/
+│   ├── Http/Controllers/
+│   │   ├── Admin/          # Controller untuk role admin
+│   │   ├── Barber/         # Controller untuk role barber
+│   │   └── Customer/       # Controller untuk role customer
+│   └── Models/             # Eloquent models
+├── database/
+│   └── migrations/         # Skema database
+├── resources/
+│   └── views/
+│       ├── admin/          # Halaman admin
+│       ├── barber/         # Halaman barber
+│       ├── customer/       # Halaman customer
+│       ├── auth/           # Halaman login & register
+│       └── layouts/        # Layout utama
+└── routes/
+    └── web.php             # Definisi semua route
+```
+
+---
+
+## Lisensi
+
+Proyek ini dibuat untuk keperluan akademik — Proyek Akhir Mata Kuliah Pemrograman Web dan Basis Data.

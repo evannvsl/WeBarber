@@ -137,14 +137,39 @@
             value="{{ auth()->check() ? auth()->user()->email : '' }}" />
         </div>
 
-        <div class="wb-field">
-          <label for="Services">Choose Service</label>
-          <select id="Services" name="service_ids[]" required>
-            <option value="" selected disabled>Choose service</option>
+        <div class="wb-field" style="grid-column: span 2;">
+          <div style="display:flex; align-items:baseline; justify-content:space-between; gap:.5rem; margin-bottom:.5rem;">
+            <label style="margin:0;">Choose Service <span style="font-weight:400;color:#aeaeb2;">(can choose more than one)</span></label>
+            <span id="svc-summary" style="font-size:.78rem;font-weight:600;color:#111;display:none;">
+              <span id="svc-total"></span> · <span id="svc-dur"></span>
+            </span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem;">
             @foreach($services as $service)
-            <option value="{{ $service->id }}">{{ $service->name }} — Rp {{ number_format($service->price, 0, ',', '.') }}</option>
+            <label
+              class="svc-card"
+              data-price="{{ $service->price }}"
+              data-duration="{{ $service->duration_minutes }}"
+              style="position:relative;display:flex;flex-direction:column;gap:.4rem;padding:1rem 1.1rem;border:1px solid #d2d2d7;border-radius:.875rem;background:#fff;cursor:pointer;transition:all .2s;">
+              <input type="checkbox" name="service_ids[]" value="{{ $service->id }}" class="svc-check" style="position:absolute;opacity:0;pointer-events:none;" />
+              {{-- tick --}}
+              <span class="svc-tick" style="position:absolute;top:.65rem;right:.75rem;width:1.1rem;height:1.1rem;border-radius:50%;border:1px solid #d2d2d7;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;transition:all .2s;"></span>
+              {{-- nama & harga --}}
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:.5rem;padding-right:1.5rem;">
+                <span class="svc-name" style="font-size:.88rem;font-weight:700;color:#0a0a0a;line-height:1.3;transition:color .2s;">{{ $service->name }}</span>
+                <span class="svc-price" style="font-size:.82rem;font-weight:700;white-space:nowrap;color:#0a0a0a;transition:color .2s;">Rp {{ number_format($service->price, 0, ',', '.') }}</span>
+              </div>
+              {{-- durasi & hint --}}
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.15rem;">
+                <span class="svc-dur-label" style="font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#aeaeb2;transition:color .2s;">± {{ $service->duration_minutes }} min</span>
+                <span class="svc-hint" style="font-size:.68rem;font-weight:700;letter-spacing:.04em;color:transparent;transition:color .2s;">PILIH →</span>
+              </div>
+            </label>
             @endforeach
-          </select>
+          </div>
+          @error('service_ids')
+          <p style="font-size:.78rem;color:#dc2626;margin-top:.25rem;">⚠ Pilih minimal satu layanan.</p>
+          @enderror
         </div>
 
         <div class="wb-field">
@@ -236,4 +261,98 @@
   </section>
 
 </main>
+@push('scripts')
+<script>
+  const cards      = document.querySelectorAll('.svc-card');
+  const summaryEl  = document.getElementById('svc-summary');
+  const totalEl    = document.getElementById('svc-total');
+  const durEl      = document.getElementById('svc-dur');
+
+  function formatRp(n) {
+    return 'Rp ' + n.toLocaleString('id-ID');
+  }
+
+  function updateSummary() {
+    let total = 0, mins = 0, count = 0;
+    cards.forEach(card => {
+      if (card.querySelector('.svc-check').checked) {
+        total += parseFloat(card.dataset.price);
+        mins  += parseInt(card.dataset.duration);
+        count++;
+      }
+    });
+    if (count > 0) {
+      totalEl.textContent = formatRp(total);
+      durEl.textContent   = '± ' + mins + ' min';
+      summaryEl.style.display = 'inline';
+    } else {
+      summaryEl.style.display = 'none';
+    }
+  }
+
+  function applyStyle(card, checked) {
+    const tick     = card.querySelector('.svc-tick');
+    const nameEl   = card.querySelector('.svc-name');
+    const priceEl  = card.querySelector('.svc-price');
+    const durLabel = card.querySelector('.svc-dur-label');
+    const hintEl   = card.querySelector('.svc-hint');
+
+    if (checked) {
+      card.style.background   = '#0a0a0a';
+      card.style.borderColor  = '#0a0a0a';
+      card.style.boxShadow    = '0 4px 16px rgba(0,0,0,.18)';
+      card.style.transform    = 'translateY(-2px)';
+      tick.style.background   = '#b8a060';
+      tick.style.borderColor  = '#b8a060';
+      tick.style.color        = '#fff';
+      tick.textContent        = '✓';
+      nameEl.style.color      = '#fff';
+      priceEl.style.color     = '#b8a060';
+      durLabel.style.color    = 'rgba(255,255,255,.4)';
+      hintEl.style.color      = '#b8a060';
+      hintEl.textContent      = 'DIPILIH ✓';
+    } else {
+      card.style.background   = '#fff';
+      card.style.borderColor  = '#d2d2d7';
+      card.style.boxShadow    = '';
+      card.style.transform    = '';
+      tick.style.background   = '';
+      tick.style.borderColor  = '#d2d2d7';
+      tick.style.color        = 'transparent';
+      tick.textContent        = '✓';
+      nameEl.style.color      = '#0a0a0a';
+      priceEl.style.color     = '#0a0a0a';
+      durLabel.style.color    = '#aeaeb2';
+      hintEl.style.color      = 'transparent';
+      hintEl.textContent      = 'PILIH →';
+    }
+  }
+
+  cards.forEach(card => {
+    const cb = card.querySelector('.svc-check');
+
+    // Hover effect
+    card.addEventListener('mouseenter', () => {
+      if (!cb.checked) card.style.borderColor = '#0a0a0a';
+    });
+    card.addEventListener('mouseleave', () => {
+      if (!cb.checked) { card.style.borderColor = '#d2d2d7'; card.querySelector('.svc-hint').style.color = 'transparent'; }
+    });
+    card.addEventListener('mouseenter', () => {
+      if (!cb.checked) card.querySelector('.svc-hint').style.color = '#6e6e73';
+    });
+
+    card.addEventListener('click', () => {
+      cb.checked = !cb.checked;
+      applyStyle(card, cb.checked);
+      updateSummary();
+    });
+
+    applyStyle(card, cb.checked);
+  });
+
+  updateSummary();
+</script>
+@endpush
+
 @endsection

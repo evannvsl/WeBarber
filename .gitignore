@@ -52,3 +52,6 @@ Thumbs.db
 !/storage/framework/sessions/.gitignore
 !/storage/framework/cache/.gitignore
 !/storage/framework/views/.gitignore
+
+/database/database.sqlite
+
