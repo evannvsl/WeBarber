@@ -36,10 +36,10 @@
       @forelse($recentBookings as $booking)
       <div class="px-6 py-3.5 flex items-center justify-between gap-3">
         <div>
-          <p class="text-[0.85rem] font-semibold text-[#111111]">{{ $booking->user->name }}</p>
-          <p class="text-[0.75rem] text-[#6e6e73]">{{ $booking->booking_date->format('d M Y') }} · {{ $booking->barber->user->name }}</p>
+          <p class="text-[0.85rem] font-semibold text-[#111111]">{{ $booking->user?->name ?? '—' }}</p>
+          <p class="text-[0.75rem] text-[#6e6e73]">{{ $booking->booking_date?->format('d M Y') ?? '—' }} · {{ $booking->barber?->user?->name ?? '—' }}</p>
         </div>
-        <span class="inline-block text-[0.68rem] font-bold tracking-[0.06em] uppercase px-2 py-0.5 rounded-full border {{ \App\Models\Booking::$statusColors[$booking->status] }}">
+        <span class="inline-block text-[0.68rem] font-bold tracking-[0.06em] uppercase px-2 py-0.5 rounded-full border {{ \App\Models\Booking::$statusColors[$booking->status] ?? 'bg-gray-50 text-gray-700 border-gray-200' }}">
           {{ ucfirst($booking->status) }}
         </span>
       </div>

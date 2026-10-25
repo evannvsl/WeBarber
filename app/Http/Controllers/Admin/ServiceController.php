@@ -10,23 +10,24 @@ class ServiceController extends Controller
 {
     public function index()
     {
-        $services = Service::latest()->paginate(10);
-        return view('admin.services.index', compact('services'));
+        $grouped = Service::orderBy('category')->orderBy('name')->get()->groupBy('category');
+        return view('admin.services.index', compact('grouped'));
     }
 
     public function create()
     {
-        return view('admin.services.create');
+        $categories = Service::CATEGORIES;
+        return view('admin.services.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
             'name'             => 'required|string|max:100',
+            'category'         => 'required|string|max:50',
             'description'      => 'nullable|string',
             'price'            => 'required|numeric|min:0',
             'duration_minutes' => 'required|integer|min:1',
-            'is_active'        => 'boolean',
         ]);
 
         $data['is_active'] = $request->has('is_active');
@@ -38,13 +39,15 @@ class ServiceController extends Controller
 
     public function edit(Service $service)
     {
-        return view('admin.services.edit', compact('service'));
+        $categories = Service::CATEGORIES;
+        return view('admin.services.edit', compact('service', 'categories'));
     }
 
     public function update(Request $request, Service $service)
     {
         $data = $request->validate([
             'name'             => 'required|string|max:100',
+            'category'         => 'required|string|max:50',
             'description'      => 'nullable|string',
             'price'            => 'required|numeric|min:0',
             'duration_minutes' => 'required|integer|min:1',
@@ -59,6 +62,12 @@ class ServiceController extends Controller
 
     public function destroy(Service $service)
     {
+        // Jika service sudah pernah dipakai di booking, nonaktifkan saja (tidak hapus)
+        if ($service->bookingDetails()->exists()) {
+            $service->update(['is_active' => false]);
+            return back()->with('success', 'Layanan dinonaktifkan karena sudah pernah digunakan dalam booking.');
+        }
+
         $service->delete();
         return back()->with('success', 'Layanan berhasil dihapus.');
     }

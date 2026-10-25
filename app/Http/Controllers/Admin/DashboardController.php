@@ -18,10 +18,10 @@ class DashboardController extends Controller
             'total_customers' => User::where('role', 'customer')->count(),
             'total_barbers'   => Barber::where('is_active', true)->count(),
             'total_bookings'  => Booking::count(),
-            'total_revenue'   => Payment::where('payment_status', 'paid')->sum('amount'),
+            'total_revenue'   => Payment::where('payment_status', 'paid')->sum('amount') ?? 0,
         ];
 
-        $recentBookings = Booking::with('user', 'barber.user')
+        $recentBookings = Booking::with(['user', 'barber.user'])
             ->latest()
             ->take(5)
             ->get();
@@ -34,12 +34,12 @@ class DashboardController extends Controller
             ->orderBy('month')
             ->get();
 
-        // Layanan paling populer
+        // Layanan paling populer — groupBy s.id saja untuk kompatibilitas MySQL strict mode
         $popularServices = DB::table('booking_details as bd')
             ->join('services as s', 'bd.service_id', '=', 's.id')
             ->join('bookings as b', 'bd.booking_id', '=', 'b.id')
             ->whereIn('b.status', ['confirmed', 'completed'])
-            ->selectRaw('s.name as nama_layanan, SUM(bd.quantity) as total_dipesan')
+            ->select('s.id', DB::raw('s.name as nama_layanan'), DB::raw('SUM(IFNULL(bd.quantity, 1)) as total_dipesan'))
             ->groupBy('s.id', 's.name')
             ->orderByDesc('total_dipesan')
             ->take(5)

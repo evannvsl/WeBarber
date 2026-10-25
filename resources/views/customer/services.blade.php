@@ -56,10 +56,10 @@
 
       <a href="{{ $bookUrl }}" class="svc-card relative bg-white border border-[#d2d2d7] rounded-2xl px-6 py-5 gap-2 shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition-all duration-250 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.09)] hover:border-[#0a0a0a]">
         <div class="flex justify-between items-baseline gap-2">
-          <span class="text-[1rem] font-bold text-[#0a0a0a] tracking-tight">Signature Cut</span>
+          <span class="text-[1rem] font-bold text-[#0a0a0a] tracking-tight">Textured Fringe</span>
           <span class="text-[0.95rem] font-bold text-[#0a0a0a] whitespace-nowrap tracking-tight">Rp 75.000</span>
         </div>
-        <p class="text-[0.83rem] text-[#6e6e73] leading-relaxed flex-1 mt-1">Precision haircut by our senior barber. Includes style consultation and finishing spray.</p>
+        <p class="text-[0.83rem] text-[#6e6e73] leading-relaxed flex-1 mt-1">Long bangs with textured fringe styling. Wet-look curtain &amp; layered flow variations available.</p>
         <div class="flex items-center justify-between mt-2">
           <span class="text-[0.72rem] font-semibold tracking-[0.05em] uppercase text-[#aeaeb2]">± 45 min</span>
           <span class="book-hint text-[0.72rem] font-bold text-[#0a0a0a] tracking-[0.04em]">RSVP →</span>
@@ -68,10 +68,10 @@
 
       <a href="{{ $bookUrl }}" class="svc-card relative bg-white border border-[#d2d2d7] rounded-2xl px-6 py-5 gap-2 shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition-all duration-250 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.09)] hover:border-[#0a0a0a]">
         <div class="flex justify-between items-baseline gap-2">
-          <span class="text-[1rem] font-bold text-[#0a0a0a] tracking-tight">Classic Fade</span>
+          <span class="text-[1rem] font-bold text-[#0a0a0a] tracking-tight">Fade &amp; Taper</span>
           <span class="text-[0.95rem] font-bold text-[#0a0a0a] whitespace-nowrap tracking-tight">Rp 65.000</span>
         </div>
-        <p class="text-[0.83rem] text-[#6e6e73] leading-relaxed flex-1 mt-1">Clean fade from skin to the top of the head. Suitable for both formal and casual appearances.</p>
+        <p class="text-[0.83rem] text-[#6e6e73] leading-relaxed flex-1 mt-1">Classic taper fade from skin to top. Buzz cut &amp; French crop variations available.</p>
         <div class="flex items-center justify-between mt-2">
           <span class="text-[0.72rem] font-semibold tracking-[0.05em] uppercase text-[#aeaeb2]">± 40 min</span>
           <span class="book-hint text-[0.72rem] font-bold text-[#0a0a0a] tracking-[0.04em]">RSVP →</span>
@@ -80,10 +80,10 @@
 
       <a href="{{ $bookUrl }}" class="svc-card relative bg-white border border-[#d2d2d7] rounded-2xl px-6 py-5 gap-2 shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition-all duration-250 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.09)] hover:border-[#0a0a0a]">
         <div class="flex justify-between items-baseline gap-2">
-          <span class="text-[1rem] font-bold text-[#0a0a0a] tracking-tight">Textured Crop</span>
+          <span class="text-[1rem] font-bold text-[#0a0a0a] tracking-tight">Wolf Cut</span>
           <span class="text-[0.95rem] font-bold text-[#0a0a0a] whitespace-nowrap tracking-tight">Rp 70.000</span>
         </div>
-        <p class="text-[0.83rem] text-[#6e6e73] leading-relaxed flex-1 mt-1">Modern cutting technique with texture on the top. Suitable for both thick and thin hair.</p>
+        <p class="text-[0.83rem] text-[#6e6e73] leading-relaxed flex-1 mt-1">Soft wolf cut with wavy curls &amp; layered texture. Comma hair &amp; Korean style available.</p>
         <div class="flex items-center justify-between mt-2">
           <span class="text-[0.72rem] font-semibold tracking-[0.05em] uppercase text-[#aeaeb2]">± 45 min</span>
           <span class="book-hint text-[0.72rem] font-bold text-[#0a0a0a] tracking-[0.04em]">RSVP →</span>
@@ -95,7 +95,7 @@
           <span class="text-[1rem] font-bold text-[#0a0a0a] tracking-tight">Undercut</span>
           <span class="text-[0.95rem] font-bold text-[#0a0a0a] whitespace-nowrap tracking-tight">Rp 60.000</span>
         </div>
-        <p class="text-[0.83rem] text-[#6e6e73] leading-relaxed flex-1 mt-1">Clean trim on the sides and back, leaving the top longer. Bold &amp; confident look.</p>
+        <p class="text-[0.83rem] text-[#6e6e73] leading-relaxed flex-1 mt-1">Classic undercut &amp; combed-back style. Clean sides with bold top — confident &amp; sharp look.</p>
         <div class="flex items-center justify-between mt-2">
           <span class="text-[0.72rem] font-semibold tracking-[0.05em] uppercase text-[#aeaeb2]">± 35 min</span>
           <span class="book-hint text-[0.72rem] font-bold text-[#0a0a0a] tracking-[0.04em]">RSVP →</span>
@@ -104,10 +104,10 @@
 
       <a href="{{ $bookUrl }}" class="svc-card relative bg-white border border-[#d2d2d7] rounded-2xl px-6 py-5 gap-2 shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition-all duration-250 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(0,0,0,0.09)] hover:border-[#0a0a0a]">
         <div class="flex justify-between items-baseline gap-2">
-          <span class="text-[1rem] font-bold text-[#0a0a0a] tracking-tight">Crew Cut</span>
+          <span class="text-[1rem] font-bold text-[#0a0a0a] tracking-tight">Mullet</span>
           <span class="text-[0.95rem] font-bold text-[#0a0a0a] whitespace-nowrap tracking-tight">Rp 55.000</span>
         </div>
-        <p class="text-[0.83rem] text-[#6e6e73] leading-relaxed flex-1 mt-1">Classic short cut with a neat profile. Easy to maintain, always looks clean.</p>
+        <p class="text-[0.83rem] text-[#6e6e73] leading-relaxed flex-1 mt-1">Modern mullet &amp; long hair style. Business in the front, party in the back.</p>
         <div class="flex items-center justify-between mt-2">
           <span class="text-[0.72rem] font-semibold tracking-[0.05em] uppercase text-[#aeaeb2]">± 30 min</span>
           <span class="book-hint text-[0.72rem] font-bold text-[#0a0a0a] tracking-[0.04em]">RSVP →</span>
@@ -120,7 +120,7 @@
           <span class="text-[1rem] font-bold text-white tracking-tight">Full Restyle</span>
           <span class="text-[0.95rem] font-bold text-white whitespace-nowrap tracking-tight">Rp 120.000</span>
         </div>
-        <p class="text-[0.83rem] text-white/55 leading-relaxed flex-1 mt-1">Deep consultation + total hair style transformation. For a completely new look.</p>
+        <p class="text-[0.83rem] text-white/55 leading-relaxed flex-1 mt-1">Deep consultation + total transformation. Any style from our gallery — made just for you.</p>
         <div class="flex items-center justify-between mt-2">
           <span class="text-[0.72rem] font-semibold tracking-[0.05em] uppercase text-white/50">± 75 min</span>
           <span class="book-hint text-[0.72rem] font-bold text-[#b8a060] tracking-[0.04em]">RSVP →</span>

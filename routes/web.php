@@ -36,7 +36,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // Customer routes
 // ─────────────────────────────────────────────
 Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer.')->group(function () {
-    Route::get('/booking',       [CustomerBookingController::class, 'create'])->name('booking');
+    Route::get('/booking',       fn() => redirect()->to(route('barbers') . '#reservation'))->name('booking');
     Route::post('/booking',      [CustomerBookingController::class, 'store'])->name('booking.store');
     Route::post('/booking/{booking}/cancel', [CustomerBookingController::class, 'cancel'])->name('booking.cancel');
     Route::get('/history',       [CustomerBookingController::class, 'history'])->name('history');
