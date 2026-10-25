@@ -3,47 +3,47 @@
 namespace App\Http\Controllers\Barber;
 
 use App\Http\Controllers\Controller;
+use App\Models\Barber;
 use App\Models\Booking;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function index()
+    private function getBarber()
     {
         $barber = Auth::user()->barber;
-
         if (! $barber) {
             abort(403, 'Profil barber belum tersedia.');
         }
+        return $barber;
+    }
 
-        $stats = [
-            'today_bookings'  => Booking::where('barber_id', $barber->id)
-                ->whereDate('booking_date', today())
-                ->whereNotIn('status', ['cancelled'])
-                ->count(),
-            'total_completed' => Booking::where('barber_id', $barber->id)
-                ->where('status', 'completed')
-                ->count(),
-            'pending_count'   => Booking::where('barber_id', $barber->id)
-                ->where('status', 'pending')
-                ->count(),
-        ];
+    public function index()
+    {
+        $barber = $this->getBarber();
 
-        $todayBookings = Booking::with('user', 'details.service')
+        $todayBookings = Booking::with(['user', 'details.service'])
             ->where('barber_id', $barber->id)
             ->whereDate('booking_date', today())
             ->whereNotIn('status', ['cancelled'])
             ->orderBy('start_time')
             ->get();
 
+        $stats = [
+            'today'     => $todayBookings->count(),
+            'pending'   => Booking::where('barber_id', $barber->id)->where('status', 'pending')->count(),
+            'completed' => Booking::where('barber_id', $barber->id)->where('status', 'completed')->count(),
+            'total'     => Booking::where('barber_id', $barber->id)->count(),
+        ];
+
         return view('barber.dashboard', compact('barber', 'stats', 'todayBookings'));
     }
 
     public function bookings()
     {
-        $barber = Auth::user()->barber;
+        $barber = $this->getBarber();
 
-        $bookings = Booking::with('user', 'details.service')
+        $bookings = Booking::with(['user', 'details.service'])
             ->where('barber_id', $barber->id)
             ->latest()
             ->paginate(15);
@@ -53,7 +53,7 @@ class DashboardController extends Controller
 
     public function schedule()
     {
-        $barber    = Auth::user()->barber;
+        $barber    = $this->getBarber();
         $schedules = $barber->schedules()->orderBy('day_of_week')->get();
 
         return view('barber.schedule', compact('barber', 'schedules'));
@@ -61,9 +61,9 @@ class DashboardController extends Controller
 
     public function history()
     {
-        $barber = Auth::user()->barber;
+        $barber = $this->getBarber();
 
-        $history = Booking::with('user', 'details.service')
+        $history = Booking::with(['user', 'details.service'])
             ->where('barber_id', $barber->id)
             ->where('status', 'completed')
             ->latest()

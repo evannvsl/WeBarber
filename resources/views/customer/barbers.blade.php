@@ -103,106 +103,220 @@
     <p class="eyebrow">Reservation</p>
     <h3>Reservation Form</h3>
 
+    {{-- ✓ Sukses --}}
     @if(session('success'))
     <div class="wb-alert success"><span>✓</span> {{ session('success') }}</div>
     @endif
 
+    {{-- ⚠ Error --}}
+    @if($errors->any())
+    <div style="margin-bottom:1.25rem;border-radius:.875rem;border:1px solid #fecaca;background:#fef2f2;overflow:hidden;">
+      <div style="display:flex;align-items:center;gap:.6rem;padding:.75rem 1.1rem;background:#fee2e2;border-bottom:1px solid #fecaca;">
+        <span style="color:#dc2626;font-size:1rem;">⚠</span>
+        <p style="margin:0;font-size:.88rem;font-weight:700;color:#991b1b;">
+          @if($errors->has('start_time') && str_contains($errors->first('start_time'), 'jadwal'))
+            Slot Waktu Tidak Tersedia
+          @else
+            Booking Tidak Berhasil
+          @endif
+        </p>
+      </div>
+      <div style="padding:.75rem 1.1rem;display:flex;flex-direction:column;gap:.4rem;">
+        @foreach($errors->all() as $error)
+        <p style="margin:0;font-size:.85rem;color:#b91c1c;display:flex;gap:.5rem;">
+          <span>—</span>
+          <span>
+            @if(str_contains($error, 'jadwal'))
+              <strong>Barber sudah ada jadwal di waktu tersebut.</strong> Pilih waktu atau barber lain.
+            @else
+              {{ $error }}
+            @endif
+          </span>
+        </p>
+        @endforeach
+      </div>
+      @if($errors->has('start_time'))
+      <div style="padding:.5rem 1.1rem;background:#fef2f2;border-top:1px solid #fecaca;font-size:.8rem;color:#dc2626;">
+        💡 <strong>Tips:</strong> Coba pilih jam berbeda, atau barber lain yang tersedia.
+      </div>
+      @endif
+    </div>
+    @endif
+
+    @guest
+    <div class="wb-alert info" style="margin-bottom:1.25rem;">
+      <span>ℹ</span>
+      <span><a href="{{ route('login') }}">Login</a> terlebih dahulu untuk membuat reservasi.</span>
+    </div>
+    @endguest
+
     @auth
     <form action="{{ route('customer.booking.store') }}" method="POST" class="wb-form">
-      @csrf
     @else
-    <div class="wb-alert info">
-      <span>ℹ</span>
-      <span><a href="{{ route('login') }}">Login</a> untuk membuat reservasi, atau isi form di bawah sebagai referensi.</span>
-    </div>
-    <form action="#" method="post" class="wb-form">
+    <form action="#" method="post" class="wb-form" onsubmit="window.location='{{ route('login') }}';return false;">
     @endauth
+      @csrf
 
       <div class="wb-grid">
 
+        {{-- Barber --}}
         <div class="wb-field">
-          <label for="nama">Full Name</label>
-          <input type="text" id="nama" name="nama" placeholder="Enter your name" required
-            value="{{ auth()->check() ? auth()->user()->name : '' }}" />
-        </div>
-
-        <div class="wb-field">
-          <label for="telepon">Telephone Number</label>
-          <input type="tel" id="telepon" name="telepon" placeholder="08xxxxxxxxxx" required />
-        </div>
-
-        <div class="wb-field">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="Examples@email.com" required
-            value="{{ auth()->check() ? auth()->user()->email : '' }}" />
-        </div>
-
-        <div class="wb-field" style="grid-column: span 2;">
-          <div style="display:flex; align-items:baseline; justify-content:space-between; gap:.5rem; margin-bottom:.5rem;">
-            <label style="margin:0;">Choose Service <span style="font-weight:400;color:#aeaeb2;">(can choose more than one)</span></label>
-            <span id="svc-summary" style="font-size:.78rem;font-weight:600;color:#111;display:none;">
-              <span id="svc-total"></span> · <span id="svc-dur"></span>
-            </span>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem;">
-            @foreach($services as $service)
-            <label
-              class="svc-card"
-              data-price="{{ $service->price }}"
-              data-duration="{{ $service->duration_minutes }}"
-              style="position:relative;display:flex;flex-direction:column;gap:.4rem;padding:1rem 1.1rem;border:1px solid #d2d2d7;border-radius:.875rem;background:#fff;cursor:pointer;transition:all .2s;">
-              <input type="checkbox" name="service_ids[]" value="{{ $service->id }}" class="svc-check" style="position:absolute;opacity:0;pointer-events:none;" />
-              {{-- tick --}}
-              <span class="svc-tick" style="position:absolute;top:.65rem;right:.75rem;width:1.1rem;height:1.1rem;border-radius:50%;border:1px solid #d2d2d7;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;transition:all .2s;"></span>
-              {{-- nama & harga --}}
-              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:.5rem;padding-right:1.5rem;">
-                <span class="svc-name" style="font-size:.88rem;font-weight:700;color:#0a0a0a;line-height:1.3;transition:color .2s;">{{ $service->name }}</span>
-                <span class="svc-price" style="font-size:.82rem;font-weight:700;white-space:nowrap;color:#0a0a0a;transition:color .2s;">Rp {{ number_format($service->price, 0, ',', '.') }}</span>
-              </div>
-              {{-- durasi & hint --}}
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.15rem;">
-                <span class="svc-dur-label" style="font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#aeaeb2;transition:color .2s;">± {{ $service->duration_minutes }} min</span>
-                <span class="svc-hint" style="font-size:.68rem;font-weight:700;letter-spacing:.04em;color:transparent;transition:color .2s;">PILIH →</span>
-              </div>
-            </label>
-            @endforeach
-          </div>
-          @error('service_ids')
-          <p style="font-size:.78rem;color:#dc2626;margin-top:.25rem;">⚠ Pilih minimal satu layanan.</p>
-          @enderror
-        </div>
-
-        <div class="wb-field">
-          <label for="barber">Choose Barber</label>
-          <select id="barber" name="barber_id" required>
-            <option value="" selected disabled>Choose barber</option>
+          <label for="barber_id">Choose Barber</label>
+          <select id="barber_id" name="barber_id" required
+            style="{{ $errors->has('barber_id') ? 'border-color:#f87171;' : '' }}">
+            <option value="" disabled selected>Choose barber</option>
             @foreach($barbers as $barber)
-            <option value="{{ $barber->id }}">{{ $barber->user->name }}</option>
+            <option value="{{ $barber->id }}" {{ old('barber_id') == $barber->id ? 'selected' : '' }}>
+              {{ $barber->user->name }}{{ $barber->specialty ? ' — ' . $barber->specialty : '' }}
+            </option>
             @endforeach
           </select>
         </div>
 
+        {{-- Tanggal --}}
         <div class="wb-field">
-          <label for="date">Reservation Date</label>
-          <input type="date" id="date" name="booking_date" required min="{{ date('Y-m-d') }}" />
+          <label for="booking_date">Reservation Date</label>
+          <input type="date" id="booking_date" name="booking_date"
+            value="{{ old('booking_date') }}"
+            min="{{ date('Y-m-d') }}" required
+            style="{{ $errors->has('booking_date') ? 'border-color:#f87171;' : '' }}" />
         </div>
 
+        {{-- Jam --}}
         <div class="wb-field">
-          <label for="time">Time Reservation</label>
-          <input type="time" id="time" name="start_time" min="09:00" max="21:00" required />
+          <label for="start_time">Start Time <span style="font-weight:400;color:#aeaeb2;">(09:00 – 21:00)</span></label>
+          <input type="time" id="start_time" name="start_time"
+            value="{{ old('start_time') }}"
+            min="09:00" max="21:00" required
+            style="{{ $errors->has('start_time') ? 'border-color:#f87171;background:#fef2f2;' : '' }}" />
+          @if($errors->has('start_time'))
+          <p style="margin:.2rem 0 0;font-size:.78rem;color:#dc2626;font-weight:500;">⚠ Waktu ini sudah terisi. Pilih jam lain.</p>
+          @endif
+        </div>
+
+        {{-- Notes --}}
+        <div class="wb-field">
+          <label for="notes">Note for Barber <span style="font-weight:400;color:#aeaeb2;">(optional)</span></label>
+          <textarea id="notes" name="notes" rows="3"
+            placeholder="E.g: what hairstyle do you want? reference photo?">{{ old('notes') }}</textarea>
         </div>
 
       </div>
 
-      <div class="wb-field full">
-        <label for="Note">Note for the Barber</label>
-        <textarea id="Note" name="notes" rows="4" placeholder="Example: What hairstyle do you want?..."></textarea>
+      {{-- ── Choose Service ── --}}
+      <div style="margin-top:1.5rem;">
+
+        {{-- Header baris: label + live summary --}}
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid #e8e8ed;">
+          <div>
+            <p style="margin:0 0 .15rem;font-size:.68rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:#b8a060;">Services</p>
+            <span style="font-size:.88rem;font-weight:550;color:#0a0a0a;">Choose Service</span>
+            <span style="font-size:.8rem;font-weight:400;color:#aeaeb2;margin-left:.35rem;">(can choose more than one)</span>
+          </div>
+          {{-- Live summary: muncul saat ada yang dipilih --}}
+          <div id="svc-summary" style="display:none;text-align:right;flex-shrink:0;">
+            <p style="margin:0;font-size:.78rem;font-weight:700;color:#0a0a0a;" id="svc-total"></p>
+            <p style="margin:.1rem 0 0;font-size:.72rem;font-weight:500;color:#6e6e73;" id="svc-dur"></p>
+          </div>
+        </div>
+
+        @php
+          /* Kelompokkan services berdasarkan kategori.
+             Prioritas: kolom 'category' jika ada, fallback ke deteksi nama. */
+          $grouped = $services->groupBy(function($s) {
+            if (!empty($s->category)) return $s->category;
+            $name = strtolower($s->name);
+            if (str_contains($name, 'beard') || str_contains($name, 'shave') || str_contains($name, 'hot towel') || str_contains($name, 'combo')) return 'Beard & Shave';
+            if (str_contains($name, 'wash') || str_contains($name, 'scalp') || str_contains($name, 'coloring') || str_contains($name, 'pomade') || str_contains($name, 'massage')) return 'Hair & Scalp Treatment';
+            return 'Haircut & Styling';
+          });
+
+          $categoryMeta = [
+            'Haircut & Styling'    => ['eyebrow' => 'Haircut'],
+            'Beard & Shave'        => ['eyebrow' => 'Beard'],
+            'Hair & Scalp Treatment' => ['eyebrow' => 'Treatment'],
+          ];
+        @endphp
+
+        @foreach($grouped as $category => $categoryServices)
+        @php
+          $meta = $categoryMeta[$category] ?? ['icon' => '•', 'eyebrow' => 'Services'];
+        @endphp
+
+        {{-- Category header --}}
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem;{{ !$loop->first ? 'margin-top:1.5rem;' : '' }}">
+          <div>
+            <p style="margin:0;font-size:.65rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#b8a060;line-height:1;">{{ $meta['eyebrow'] }}</p>
+            <p style="margin:.1rem 0 0;font-size:.9rem;font-weight:600;color:#0a0a0a;letter-spacing:-.3px;line-height:1.2;">{{ $category }}</p>
+          </div>
+        </div>
+
+        {{-- Service cards grid --}}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.75rem;">
+          @foreach($categoryServices as $service)
+          @php $checked = in_array($service->id, old('service_ids', [])); @endphp
+          <label
+            class="svc-card"
+            data-price="{{ $service->price }}"
+            data-duration="{{ $service->duration_minutes }}"
+            style="position:relative;display:flex;flex-direction:column;gap:.4rem;padding:1rem 1.1rem;
+                   border:1px solid {{ $checked ? '#0a0a0a' : '#d2d2d7' }};
+                   border-radius:.875rem;
+                   background:{{ $checked ? '#0a0a0a' : '#fff' }};
+                   cursor:pointer;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04);">
+            <input type="checkbox" name="service_ids[]" value="{{ $service->id }}"
+              {{ $checked ? 'checked' : '' }}
+              class="svc-check" style="position:absolute;opacity:0;pointer-events:none;" />
+            {{-- tick badge --}}
+            <span class="svc-tick" style="position:absolute;top:.65rem;right:.75rem;width:1.15rem;height:1.15rem;border-radius:50%;
+                         border:1px solid {{ $checked ? '#b8a060' : '#d2d2d7' }};
+                         background:{{ $checked ? '#b8a060' : 'transparent' }};
+                         display:flex;align-items:center;justify-content:center;
+                         font-size:.6rem;font-weight:700;
+                         color:{{ $checked ? '#fff' : 'transparent' }};
+                         transition:all .2s;">✓</span>
+            {{-- nama & harga --}}
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:.4rem;padding-right:1.6rem;">
+              <span class="svc-name" style="font-size:.88rem;font-weight:700;line-height:1.3;transition:color .2s;
+                           color:{{ $checked ? '#fff' : '#0a0a0a' }};">{{ $service->name }}</span>
+              <span class="svc-price" style="font-size:.82rem;font-weight:700;white-space:nowrap;transition:color .2s;
+                           color:{{ $checked ? '#b8a060' : '#0a0a0a' }};">
+                Rp {{ number_format($service->price, 0, ',', '.') }}
+              </span>
+            </div>
+            @if($service->description)
+            <p class="svc-desc" style="margin:0;font-size:.76rem;line-height:1.5;transition:color .2s;
+                       color:{{ $checked ? 'rgba(255,255,255,.5)' : '#6e6e73' }};">
+              {{ Str::limit($service->description, 70) }}
+            </p>
+            @endif
+            {{-- durasi & hint --}}
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.15rem;">
+              <span class="svc-dur-label" style="font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;transition:color .2s;
+                           color:{{ $checked ? 'rgba(255,255,255,.4)' : '#aeaeb2' }};">
+                ± {{ $service->duration_minutes }} min
+              </span>
+              <span class="svc-hint" style="font-size:.68rem;font-weight:700;letter-spacing:.04em;transition:color .2s;
+                           color:{{ $checked ? '#b8a060' : 'transparent' }};">
+                {{ $checked ? 'DIPILIH ✓' : 'PILIH →' }}
+              </span>
+            </div>
+          </label>
+          @endforeach
+        </div>
+
+        @endforeach
+
+        @error('service_ids')
+        <p style="margin:.5rem 0 0;font-size:.78rem;color:#dc2626;font-weight:500;">⚠ Pilih minimal satu layanan.</p>
+        @enderror
+
       </div>
 
       <div class="wb-actions">
         @auth
-        <button type="submit" class="wb-btn primary">Make a reservation</button>
-        <button type="reset" class="wb-btn ghost">Reset</button>
+        <button type="submit" class="wb-btn primary">Make a Reservation</button>
+        <button type="reset" class="wb-btn ghost" id="rsvp-reset">Reset</button>
         @else
         <a href="{{ route('login') }}" class="wb-btn primary">Login to Book →</a>
         @endauth
@@ -235,14 +349,26 @@
           <tr>
             <td class="num">2</td>
             <td class="name">Fairus</td>
-            <td>Co-Founder &amp; Operations Manager</td>
+            <td>Co-Founder &amp; Vice Barber</td>
             <td>fairuzrasidin33@email.com</td>
           </tr>
           <tr>
             <td class="num">3</td>
-            <td class="name">Ahmad</td>
+            <td class="name">Kumiko</td>
             <td>Barber</td>
-            <td>ahmadmohamed44@email.com</td>
+            <td>oumae@email.com</td>
+          </tr>
+          <tr>
+            <td class="num">4</td>
+            <td class="name">Kawakami</td>
+            <td>Barber</td>
+            <td>kawakami@email.com</td>
+          </tr>
+          <tr>
+            <td class="num">5</td>
+            <td class="name">Chihiro</td>
+            <td>Barber</td>
+            <td>chihiro@email.com</td>
           </tr>
         </tbody>
       </table>
@@ -263,10 +389,10 @@
 </main>
 @push('scripts')
 <script>
-  const cards      = document.querySelectorAll('.svc-card');
-  const summaryEl  = document.getElementById('svc-summary');
-  const totalEl    = document.getElementById('svc-total');
-  const durEl      = document.getElementById('svc-dur');
+  const cards     = document.querySelectorAll('.svc-card');
+  const summaryEl = document.getElementById('svc-summary');
+  const totalEl   = document.getElementById('svc-total');
+  const durEl     = document.getElementById('svc-dur');
 
   function formatRp(n) {
     return 'Rp ' + n.toLocaleString('id-ID');
@@ -294,6 +420,7 @@
     const tick     = card.querySelector('.svc-tick');
     const nameEl   = card.querySelector('.svc-name');
     const priceEl  = card.querySelector('.svc-price');
+    const descEl   = card.querySelector('.svc-desc');
     const durLabel = card.querySelector('.svc-dur-label');
     const hintEl   = card.querySelector('.svc-hint');
 
@@ -308,6 +435,7 @@
       tick.textContent        = '✓';
       nameEl.style.color      = '#fff';
       priceEl.style.color     = '#b8a060';
+      if (descEl) descEl.style.color = 'rgba(255,255,255,.5)';
       durLabel.style.color    = 'rgba(255,255,255,.4)';
       hintEl.style.color      = '#b8a060';
       hintEl.textContent      = 'DIPILIH ✓';
@@ -316,12 +444,13 @@
       card.style.borderColor  = '#d2d2d7';
       card.style.boxShadow    = '';
       card.style.transform    = '';
-      tick.style.background   = '';
+      tick.style.background   = 'transparent';
       tick.style.borderColor  = '#d2d2d7';
       tick.style.color        = 'transparent';
       tick.textContent        = '✓';
       nameEl.style.color      = '#0a0a0a';
       priceEl.style.color     = '#0a0a0a';
+      if (descEl) descEl.style.color = '#6e6e73';
       durLabel.style.color    = '#aeaeb2';
       hintEl.style.color      = 'transparent';
       hintEl.textContent      = 'PILIH →';
@@ -331,15 +460,17 @@
   cards.forEach(card => {
     const cb = card.querySelector('.svc-check');
 
-    // Hover effect
     card.addEventListener('mouseenter', () => {
-      if (!cb.checked) card.style.borderColor = '#0a0a0a';
+      if (!cb.checked) {
+        card.style.borderColor = '#0a0a0a';
+        card.querySelector('.svc-hint').style.color = '#6e6e73';
+      }
     });
     card.addEventListener('mouseleave', () => {
-      if (!cb.checked) { card.style.borderColor = '#d2d2d7'; card.querySelector('.svc-hint').style.color = 'transparent'; }
-    });
-    card.addEventListener('mouseenter', () => {
-      if (!cb.checked) card.querySelector('.svc-hint').style.color = '#6e6e73';
+      if (!cb.checked) {
+        card.style.borderColor = '#d2d2d7';
+        card.querySelector('.svc-hint').style.color = 'transparent';
+      }
     });
 
     card.addEventListener('click', () => {
@@ -350,6 +481,20 @@
 
     applyStyle(card, cb.checked);
   });
+
+  // Reset button: kembalikan semua kartu ke state unselected
+  const resetBtn = document.getElementById('rsvp-reset');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      setTimeout(() => {
+        cards.forEach(card => {
+          card.querySelector('.svc-check').checked = false;
+          applyStyle(card, false);
+        });
+        updateSummary();
+      }, 10);
+    });
+  }
 
   updateSummary();
 </script>

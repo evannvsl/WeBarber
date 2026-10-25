@@ -15,10 +15,7 @@ class BookingController extends Controller
 {
     public function create()
     {
-        $services = Service::where('is_active', true)->get();
-        $barbers  = Barber::with('user', 'schedules')->where('is_active', true)->get();
-
-        return view('customer.booking', compact('services', 'barbers'));
+        return redirect()->to(route('barbers') . '#reservation');
     }
 
     public function store(Request $request)
