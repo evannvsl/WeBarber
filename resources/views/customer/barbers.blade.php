@@ -354,21 +354,21 @@
           </tr>
           <tr>
             <td class="num">3</td>
-            <td class="name">Kumiko</td>
+            <td class="name">Robbi</td>
             <td>Barber</td>
-            <td>oumae@email.com</td>
+            <td>robbi@email.com</td>
           </tr>
           <tr>
             <td class="num">4</td>
-            <td class="name">Kawakami</td>
+            <td class="name">Rakha</td>
             <td>Barber</td>
-            <td>kawakami@email.com</td>
+            <td>rakha@email.com</td>
           </tr>
           <tr>
             <td class="num">5</td>
-            <td class="name">Chihiro</td>
+            <td class="name">Akbar</td>
             <td>Barber</td>
-            <td>chihiro@email.com</td>
+            <td>akbar@email.com</td>
           </tr>
         </tbody>
       </table>
