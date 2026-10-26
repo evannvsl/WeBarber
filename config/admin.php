@@ -1,6 +1,3 @@
-<!-- ini  -->
-
-
 <?php
 
 return [
