@@ -10,7 +10,10 @@ class ServiceController extends Controller
 {
     public function index()
     {
-        $grouped = Service::orderBy('category')->orderBy('name')->get()->groupBy('category');
+        $order   = ['Haircut & Styling', 'Beard & Shave', 'Hair & Scalp Treatment'];
+        $grouped = Service::orderBy('name')->get()
+            ->groupBy('category')
+            ->sortBy(fn($_, $cat) => array_search($cat, $order) !== false ? array_search($cat, $order) : 99);
         return view('admin.services.index', compact('grouped'));
     }
 

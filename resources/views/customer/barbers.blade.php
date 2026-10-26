@@ -210,7 +210,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid #e8e8ed;">
           <div>
             <p style="margin:0 0 .15rem;font-size:.68rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:#b8a060;">Services</p>
-            <span style="font-size:.88rem;font-weight:550;color:#0a0a0a;">Choose Service</span>
+            <span style="font-size:.88rem;font-weight:550;color:#0a0a0a; margin-top:-.25rem;">Choose Service</span>
             <span style="font-size:.8rem;font-weight:400;color:#aeaeb2;margin-left:.35rem;">(can choose more than one)</span>
           </div>
           {{-- Live summary: muncul saat ada yang dipilih --}}
@@ -247,7 +247,7 @@
         <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem;{{ !$loop->first ? 'margin-top:1.5rem;' : '' }}">
           <div>
             <p style="margin:0;font-size:.65rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#b8a060;line-height:1;">{{ $meta['eyebrow'] }}</p>
-            <p style="margin:.1rem 0 0;font-size:.9rem;font-weight:600;color:#0a0a0a;letter-spacing:-.3px;line-height:1.2;">{{ $category }}</p>
+            <p style="margin:.1rem 0 0;font-size:.9rem;font-weight:600;color:#0a0a0a;letter-spacing:-.3px;line-height:1.2; margin-top:.25rem;">{{ $category }}</p>
           </div>
         </div>
 
