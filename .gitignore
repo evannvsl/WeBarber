@@ -54,3 +54,6 @@ Thumbs.db
 
 /database/database.sqlite
 
+
+# Local SSL certificates
+/certs/
