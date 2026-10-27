@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
-composer install --no-dev --optimize-autoloader --no-interaction
+echo "Installing Node dependencies..."
 npm ci
+
+echo "Building frontend..."
 npm run build
