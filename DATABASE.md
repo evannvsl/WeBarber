@@ -19,24 +19,29 @@ dan cara menambahkan data ke masing-masing tabel.
 | 7 | `payments` | Data pembayaran tiap booking |
 | 8 | `password_reset_tokens` | Token reset password *(Laravel default)* |
 | 9 | `sessions` | Sesi login aktif *(Laravel default)* |
-| 10 | `cache` | Cache framework *(Laravel default)* |
-| 11 | `jobs` | Queue jobs *(Laravel default)* |
+| 10 | `cache` & `cache_locks` | Cache framework & atomic lock *(Laravel default)* |
+| 11 | `jobs`, `job_batches`, `failed_jobs` | Queue jobs *(Laravel default)* |
+
+> Total ada **14 tabel fisik**: 7 tabel domain (no. 1–7) dan 7 tabel bawaan Laravel (`password_reset_tokens`, `sessions`, `cache`, `cache_locks`, `jobs`, `job_batches`, `failed_jobs`).
 
 ---
 
 ## Diagram Relasi (ERD)
 
 ```
-users (1) ──────────────────── (1) barbers
-  │                                   │
-  │                                   ├──── (many) barber_schedules
-  │                                   │
-  └──── (many) bookings ──── (many) ──┘
-               │
-               ├──── (many) booking_details ──── (many) services
-               │
-               └──── (1) payments
+users (1) ──── (0..1) barbers (1) ──── (N) barber_schedules
+  │                      │
+  │ 1:N                  │ 1:N
+  └────────► bookings ◄──┘
+                │
+      ┌─────────┴─────────┐
+      │ 1:N               │ 1:N
+booking_details        payments
+      │ N:1
+   services
 ```
+
+> `bookings` punya dua foreign key: `user_id` (customer) dan `barber_id`. Tabel bawaan Laravel (`sessions`, `cache`, `jobs`, dst.) tidak punya foreign key ke tabel domain, jadi tidak digambar. `sessions.user_id` hanya diberi index, tanpa constraint foreign key.
 
 ### Penjelasan Relasi Eloquent
 
@@ -50,7 +55,7 @@ users (1) ──────────────────── (1) barbe
 | `Booking` | `belongsTo` | `User` | Booking dimiliki satu customer |
 | `Booking` | `belongsTo` | `Barber` | Booking ditangani satu barber |
 | `Booking` | `hasMany` | `BookingDetail` | Booking bisa punya banyak detail layanan |
-| `Booking` | `hasOne` | `Payment` | Booking punya satu pembayaran |
+| `Booking` | `hasMany` | `Payment` | Booking bisa punya lebih dari satu data pembayaran (method `payments()`) |
 | `BookingDetail` | `belongsTo` | `Booking` | Detail milik satu booking |
 | `BookingDetail` | `belongsTo` | `Service` | Detail mereferensikan satu layanan |
 | `Payment` | `belongsTo` | `Booking` | Pembayaran milik satu booking |
@@ -96,10 +101,10 @@ Pemisahan peran dilakukan lewat kolom `role`, bukan tabel terpisah.
 | `name` | VARCHAR(100) | — | Nama lengkap pengguna |
 | `email` | VARCHAR(100), UNIQUE | — | Email login, harus unik |
 | `email_verified_at` | TIMESTAMP, NULL | `null` | Waktu verifikasi email |
-| `password` | VARCHAR | — | Password (bcrypt hash, **bukan plaintext**) |
+| `password` | VARCHAR(255) | — | Password (bcrypt hash, **bukan plaintext**) |
 | `role` | ENUM | `'customer'` | Peran: `admin`, `barber`, atau `customer` |
 | `phone` | VARCHAR(20), NULL | `null` | Nomor telepon (opsional) |
-| `profile_photo_path` | VARCHAR, NULL | `null` | Path foto profil |
+| `profile_photo_path` | VARCHAR(255), NULL | `null` | Path foto profil (ditambah via migration terpisah, posisi kolom paling akhir) |
 | `remember_token` | VARCHAR(100), NULL | `null` | Token "remember me" Laravel |
 | `created_at` | TIMESTAMP | — | Waktu dibuat (otomatis) |
 | `updated_at` | TIMESTAMP | — | Waktu diupdate (otomatis) |
@@ -109,7 +114,7 @@ Pemisahan peran dilakukan lewat kolom `role`, bukan tabel terpisah.
 **A. Lewat UI (Halaman Registrasi)**
 - Buka `http://localhost:8000/register`
 - Isi form → role default akan menjadi `customer`
-- Untuk membuat barber/admin, harus diubah lewat panel admin atau Tinker
+- Untuk membuat barber/admin, buat lewat panel admin (login admin → menu **Users** → tambah user dengan role yang diinginkan) atau lewat Tinker
 
 **B. Lewat Laravel Tinker**
 ```bash
@@ -161,7 +166,7 @@ VALUES (
 
 **D. Lewat Seeder**
 
-Edit file `database/seeders/DatabaseSeeder.php` atau buat seeder baru:
+`DatabaseSeeder` saat ini hanya membuat akun **admin** dari variabel `.env` (`ADMIN_EMAIL`/`ADMIN_PASSWORD`, `ADMIN2_*`, `ADMIN3_*`); baris dilewati jika variabelnya kosong. Untuk data lain, buat seeder baru:
 ```bash
 php artisan make:seeder UserSeeder
 ```
@@ -207,8 +212,8 @@ terlebih dahulu, baru kemudian dibuat entri di tabel ini.
 #### Cara Menambahkan Data
 
 **A. Lewat UI (Panel Admin)**
-- Login sebagai admin → menu **Barber** → **Tambah Barber**
-- Form akan otomatis membuat user + barber sekaligus
+- Login sebagai admin → menu **Users** → buat user dengan role `barber` terlebih dahulu
+- Lalu menu **Barbers** → tambah barber, pilih user ber-role `barber` yang belum punya profil (form ini **tidak** membuat user baru)
 
 **B. Lewat Laravel Tinker**
 ```bash
@@ -265,10 +270,10 @@ Tabel ini berdiri sendiri, tidak bergantung pada tabel lain.
 |-------|------|---------|------------|
 | `id` | BIGINT UNSIGNED, PK, AI | — | Primary key otomatis |
 | `name` | VARCHAR(100) | — | Nama layanan |
+| `category` | VARCHAR(50) | `'Haircut & Styling'` | Kategori layanan (ditambah via migration terpisah, diletakkan setelah `name`). Pilihan di model: `Haircut & Styling`, `Beard & Shave`, `Hair & Scalp Treatment` |
 | `description` | TEXT, NULL | `null` | Deskripsi layanan |
 | `price` | DECIMAL(10,2) | — | Harga dalam rupiah (contoh: `35000.00`) |
 | `duration_minutes` | INT | — | Durasi pengerjaan dalam menit |
-| `category` | VARCHAR/ENUM | — | Kategori layanan (ditambah via migration terpisah) |
 | `is_active` | BOOLEAN | `true` | Jika `false`, layanan tidak tampil ke customer |
 | `created_at` | TIMESTAMP | — | Otomatis |
 | `updated_at` | TIMESTAMP | — | Otomatis |
@@ -276,7 +281,7 @@ Tabel ini berdiri sendiri, tidak bergantung pada tabel lain.
 #### Cara Menambahkan Data
 
 **A. Lewat UI (Panel Admin)**
-- Login sebagai admin → menu **Layanan** → **Tambah Layanan**
+- Login sebagai admin → menu **Services** → tambah layanan (field `category` wajib diisi di form)
 
 **B. Lewat Laravel Tinker**
 ```bash
@@ -349,7 +354,7 @@ Setiap barber idealnya punya **7 baris** (satu per hari), dengan hari libur dita
 #### Cara Menambahkan Data
 
 **A. Lewat UI (Panel Admin)**
-- Login sebagai admin → menu **Barber** → pilih barber → **Atur Jadwal**
+- Login sebagai admin → menu **Schedules** → pilih barber, hari, dan jam. Penyimpanan memakai `updateOrCreate` per kombinasi barber + hari, jadi di level aplikasi hanya ada satu baris per hari per barber (di database tidak ada constraint UNIQUE-nya)
 
 **B. Lewat Laravel Tinker**
 ```bash
@@ -415,12 +420,15 @@ pending → confirmed → completed
          cancelled
 ```
 
+Customer hanya bisa membatalkan booking berstatus `pending`. Admin bisa mengubah status lewat menu **Bookings**, dan mencatat pembayaran otomatis menjadi `completed`.
+
 **Constraint:** `user_id` dan `barber_id` CASCADE ON DELETE.
 
 #### Cara Menambahkan Data
 
 **A. Lewat UI (Halaman Customer)**
-- Login sebagai customer → **Buat Booking** → pilih barber, tanggal, jam, layanan
+- Login sebagai customer → halaman **Barbers** (bagian reservation) → pilih barber, tanggal, jam, layanan
+- Sistem menghitung `end_time` dari total durasi layanan, mengecek bentrok jadwal barber, lalu menyimpan `bookings` + `booking_details` dalam satu `DB::transaction()`
 
 **B. Lewat Laravel Tinker**
 ```bash
@@ -536,7 +544,7 @@ DB::transaction(function () use ($data, $services) {
 
 #### Fungsi
 Menyimpan **data pembayaran** untuk setiap booking yang sudah selesai atau sedang diproses.
-Satu booking memiliki satu data payment. Biasanya dibuat oleh admin setelah barber menyelesaikan layanan.
+Secara skema satu booking bisa memiliki lebih dari satu data payment (relasi `hasMany`, tidak ada UNIQUE pada `booking_id`). Biasanya dibuat oleh admin setelah barber menyelesaikan layanan.
 
 #### Struktur Kolom
 
@@ -556,7 +564,8 @@ Satu booking memiliki satu data payment. Biasanya dibuat oleh admin setelah barb
 #### Cara Menambahkan Data
 
 **A. Lewat UI (Panel Admin)**
-- Login sebagai admin → menu **Booking** → pilih booking → **Catat Pembayaran**
+- Login sebagai admin → menu **Bookings** → buka detail booking → form pembayaran. Pembayaran langsung tercatat `paid` dengan `paid_at` = sekarang, dan status booking otomatis menjadi `completed`
+- Menu **Payments** dipakai untuk melihat daftar dan mengubah `payment_status` (pending/paid/failed/refunded)
 
 **B. Lewat Laravel Tinker**
 ```bash
@@ -704,7 +713,7 @@ session expired, baris tersebut dihapus.
 | Kolom | Tipe | Keterangan |
 |-------|------|------------|
 | `id` | VARCHAR, **Primary Key** | ID sesi unik (string acak panjang, bukan auto-increment) |
-| `user_id` | BIGINT UNSIGNED, NULL | ID user yang login (NULL jika guest/belum login) |
+| `user_id` | BIGINT UNSIGNED, NULL, INDEX | ID user yang login (NULL jika guest/belum login). Hanya di-index, **tanpa** foreign key constraint |
 | `ip_address` | VARCHAR(45), NULL | IP address perangkat yang login |
 | `user_agent` | TEXT, NULL | Browser/device info (contoh: `Mozilla/5.0 ...`) |
 | `payload` | LONGTEXT | Data sesi (di-encrypt & di-encode base64): berisi user ID, token CSRF, flash messages, dll |
@@ -757,14 +766,16 @@ SELECT id, user_id, ip_address, last_activity FROM sessions;
 
 ```bash
 # Paksa logout SEMUA user (hapus semua sesi) — berguna saat deploy/update besar
-php artisan session:clear
+# (Laravel tidak punya perintah `session:clear`, hapus lewat Tinker/SQL)
+php artisan tinker
+>>> DB::table('sessions')->truncate();
 
 # Lihat semua sesi aktif via Tinker
 php artisan tinker
 >>> DB::table('sessions')->whereNotNull('user_id')->get(['user_id','ip_address','last_activity']);
 
 # Lihat jumlah user yang sedang online
->>> DB::table('sessions')->whereNotNull('user_id')->distinct('user_id')->count();
+>>> DB::table('sessions')->whereNotNull('user_id')->distinct()->count('user_id');
 ```
 
 #### Konfigurasi di `.env`
@@ -791,10 +802,7 @@ Karena `.env` mengatur `CACHE_STORE=database`, Laravel menyimpan semua
 **data cache** ke tabel ini. Cache digunakan untuk menyimpan hasil komputasi
 yang mahal agar tidak perlu diulang setiap request.
 
-Contoh data yang dicache di WeBarber:
-- Daftar layanan aktif (agar tidak query ke DB setiap halaman booking dibuka)
-- Statistik dashboard (total customer, total revenue, dll)
-- Rate limiting data (pembatasan login gagal)
+> Catatan: kode aplikasi WeBarber saat ini **belum memakai** `Cache::` sama sekali (tidak ada pemanggilan di `app/` maupun `routes/`). Tabel ini disiapkan oleh konfigurasi bawaan Laravel, dan contoh key di bawah hanya ilustrasi cara kerja cache.
 
 #### Struktur Tabel `cache`
 
@@ -856,7 +864,7 @@ Cache::flush();
 #### Isi Data Contoh
 
 ```sql
-SELECT key, expiration FROM cache;
+SELECT `key`, expiration FROM cache;  -- `key` kata cadangan MySQL, wajib pakai backtick
 -- +----------------------------------+------------+
 -- | key                              | expiration |
 -- +----------------------------------+------------+
@@ -892,10 +900,9 @@ Karena `.env` mengatur `QUEUE_CONNECTION=database`, Laravel menyimpan semua
 **pekerjaan background (queue jobs)** ke tabel-tabel ini.
 
 Queue digunakan untuk menjalankan tugas berat di latar belakang agar user
-tidak perlu menunggu. Contoh penggunaan di WeBarber:
-- Kirim email konfirmasi booking (tidak ingin user nunggu proses kirim email)
-- Kirim notifikasi ke barber saat ada booking baru
-- Proses laporan bulanan yang berat
+tidak perlu menunggu.
+
+> Catatan: kode WeBarber saat ini **belum punya** Job, Mail, atau Notification (tidak ada folder `app/Jobs`, `app/Mail`, `app/Notifications`), jadi tidak ada kode aplikasi yang mengisi ketiga tabel ini. Contoh seperti kirim email konfirmasi booking di bawah hanya ilustrasi penggunaan queue.
 
 ---
 
@@ -991,8 +998,8 @@ Berguna untuk investigasi dan retry manual.
 # Jalankan worker (memproses job dari tabel jobs)
 php artisan queue:work
 
-# Jalankan worker terus-menerus (tidak berhenti setelah job habis)
-php artisan queue:work --daemon
+# Hentikan worker dengan rapi setelah job yang sedang jalan selesai (misal setelah deploy)
+php artisan queue:restart
 
 # Lihat semua job yang gagal
 php artisan queue:failed
@@ -1020,7 +1027,7 @@ php artisan tinker
 | Tabel | Dikontrol via `.env` | Diisi oleh | Dihapus oleh | Perlu disentuh manual? |
 |-------|----------------------|------------|--------------|------------------------|
 | `password_reset_tokens` | *(config/auth.php)* | Laravel Auth saat user klik "Lupa Password" | Laravel setelah token dipakai / `auth:clear-resets` | ❌ Tidak |
-| `sessions` | `SESSION_DRIVER=database` | Laravel setiap ada request/login | Laravel saat logout / session expired | ❌ Tidak (kecuali force logout: `session:clear`) |
+| `sessions` | `SESSION_DRIVER=database` | Laravel setiap ada request/login | Laravel saat logout / session expired | ❌ Tidak (kecuali force logout: hapus isi tabel `sessions`) |
 | `cache` | `CACHE_STORE=database` | Laravel saat `Cache::put()` / `Cache::remember()` | Laravel saat cache expired / `cache:clear` | ❌ Tidak (kecuali debug: `cache:clear`) |
 | `cache_locks` | `CACHE_STORE=database` | Laravel saat atomic lock digunakan | Laravel saat lock dilepas / expired | ❌ Tidak |
 | `jobs` | `QUEUE_CONNECTION=database` | Laravel saat job di-dispatch | Worker setelah job berhasil dieksekusi | ❌ Tidak (jalankan `queue:work`) |
