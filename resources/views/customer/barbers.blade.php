@@ -351,31 +351,31 @@
           <tr>
             <td class="num">1</td>
             <td class="name">Evan</td>
-            <td>Founder &amp; Head Barber</td>
+            <td>Founder</td>
             <td>evangalangwry11@email.com</td>
           </tr>
           <tr>
             <td class="num">2</td>
-            <td class="name">Fairus</td>
-            <td>Co-Founder &amp; Vice Barber</td>
-            <td>fairuzrasidin33@email.com</td>
+            <td class="name">Robbi</td>
+            <td>Co-Founder</td>
+            <td>robbi@gmail.com</td>
           </tr>
           <tr>
             <td class="num">3</td>
-            <td class="name">Robbi</td>
-            <td>Barber</td>
-            <td>robbi@email.com</td>
+            <td class="name">Fairuz</td>
+            <td>Admin</td>
+            <td>fairuzrasidin33@email.com</td>
           </tr>
           <tr>
             <td class="num">4</td>
             <td class="name">Rakha</td>
-            <td>Barber</td>
+            <td>Admin</td>
             <td>rakha@email.com</td>
           </tr>
           <tr>
             <td class="num">5</td>
             <td class="name">Akbar</td>
-            <td>Barber</td>
+            <td>Admin</td>
             <td>akbar@email.com</td>
           </tr>
         </tbody>
